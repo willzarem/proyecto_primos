@@ -1,4 +1,5 @@
 import pyaudio
+import wave
 import sys
 import numpy as np
 import aubio
@@ -13,7 +14,6 @@ n_channels = 1
 samplerate = 44100
 stream = p.open(format=pyaudio_format, channels=n_channels, rate=samplerate, input=True, frames_per_buffer=buffer_size)
 
-output_filename = output
 record_duration = 5
 outputsink = aubio.sink(output, samplerate)
 total_frames = 0
@@ -29,12 +29,13 @@ print("*** starting recording")
 while True:
     try:
         audiobuffer = stream.read(buffer_size)
-        signal = np.fromstring(audiobuffer, dtype=np.float32)
+        signal = np.frombuffer(audiobuffer, dtype=np.float32)
 
         pitch = pitch_o(signal)[0]
         confidence = pitch_o.get_confidence()
-
-        print("{} / {}".format(pitch, confidence))
+        if pitch > 50:
+            print("signal")
+            print("{} / {}".format(pitch, confidence))
 
         if outputsink:
             outputsink(signal, len(signal))
@@ -47,8 +48,25 @@ while True:
         print("*** Stopped")
         break
 
-
 print("*** done recording")
 stream.stop_stream()
 stream.close()
+
+wf = wave.open(output, 'rb')
+
+print("channels %s", wf.getnchannels())
+
+read_stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                     channels=wf.getnchannels(),
+                     rate=wf.getframerate(),
+                     output=True)
+
+data = wf.readframes(buffer_size)
+print('playing')
+while data != '':
+    read_stream.write(data)
+    data = wf.readframes(buffer_size)
+
+read_stream.stop_stream()
+read_stream.close()
 p.terminate()
