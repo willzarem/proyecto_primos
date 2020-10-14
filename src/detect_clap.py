@@ -5,8 +5,8 @@ import sys
 from scipy.signal import find_peaks
 
 class Clap:
-    def __init__(self):
-        filename = sys.argv[1]
+    def __init__(self, file):
+        filename = file
         spf = wave.open(filename, "r")
         signal = spf.readframes(-1)
         self.signal = np.fromstring(signal, "Int16")
