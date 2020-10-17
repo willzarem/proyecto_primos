@@ -33,23 +33,29 @@ pitch_o.set_tolerance(tolerance)
 def record(child_conn):
     print("*** starting recording")
     while True:
-        print("In True")
+        #print("In True")
         try:
-            print("about to read audio buffer")
+            #print("about to read audio buffer")
             audiobuffer = stream.read(0)
-            print("about to get signal")
+            #print("about to get signal")
             signal = np.frombuffer(audiobuffer, dtype=np.float32)
             
-            print("about to send signal")
-            child_conn.send(signal, "sending signal")
-            print("in record")
+            #print("about to send signal")
+            child_conn.send("sending signal")
+            #print("in record")
         except KeyboardInterrupt:
             print("*** Stopped")
             break
-        except:
-            print("An exception occured ") 
+        except Exception as ex:
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(ex).__name__, ex.args)
+            print(message)
 
     print("*** done recording")
     stream.stop_stream()
     stream.close()
+    child_conn.close()
+    
+def test(child_conn):
+    child_conn.send("hello")
     child_conn.close()
