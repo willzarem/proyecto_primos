@@ -13,15 +13,19 @@ def receiveSoundData(parent_conn):
 if __name__ == '__main__':
     parent_conn, child_conn = Pipe()
     p1 = Process(target=record, args=(child_conn,))
-    p2 = Process(target=receiveSoundData, args=(parent_conn,))
+ #   p2 = Process(target=receiveSoundData, args=(parent_conn,))
     p1.start()
-    p2.start()
-    print(parent_conn.recv())
+#    p2.start()
+    while(parent_conn.recv() != 0):
+        print(parent_conn.recv())
+        pass
+    
+    #print(parent_conn.recv())
     #print(receiveSoundData(child_conn))
     # q = Queue()
-    # p = Process(target=receiveSoundData, args=(q,))
+    # p = Process(target=receiveSoundData, args=(child_conn,))
     # p.start()
-    #     # prints "[42, None, 'hello']"
+        # prints "[42, None, 'hello']"
 
     # num_proc = 2
     # consumer_pool = Pool(num_proc)
@@ -30,7 +34,7 @@ if __name__ == '__main__':
     # for _ in range(num_proc):
     #     results.append(consumer_pool.apply_async(p, args= (receiveSoundData,)))
     # print(results)
-    p2.join()
+    #p2.join()
     p1.join()
 # recorded_data = multiprocessing.Queue(100)
 
