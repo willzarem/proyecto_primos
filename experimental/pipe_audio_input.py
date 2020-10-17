@@ -33,17 +33,21 @@ pitch_o.set_tolerance(tolerance)
 def record(child_conn):
     print("*** starting recording")
     while True:
+        print("In True")
         try:
-            audiobuffer = stream.read(buffer_size)
+            print("about to read audio buffer")
+            audiobuffer = stream.read(0)
+            print("about to get signal")
             signal = np.frombuffer(audiobuffer, dtype=np.float32)
             
             print("about to send signal")
             child_conn.send(signal, "sending signal")
             print("in record")
-        
         except KeyboardInterrupt:
             print("*** Stopped")
             break
+        except:
+            print("An exception occured ") 
 
     print("*** done recording")
     stream.stop_stream()
